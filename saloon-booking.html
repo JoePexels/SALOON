@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment | Beatrice Salon | Premium Unisex Beauty Salon, Uganda</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Pacifico&display=swap"
+        rel="stylesheet">
+        <link rel="stylesheet" href="css/style.css">
+    <style>
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header" class="transparent">
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html" class="logo-text">Beatrice </a>
+            </div>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="index.html" class="nav-link active">Home</a></li>
+                    <li><a href="#services" class="nav-link">Services</a></li>
+                    <li><a href="saloon-contact-us.html" class="nav-link">Contact Us</a></li>
+                    <li><a href="saloon-booking.html" class="nav-link">Book</a></li>
+                    <a href="saloon-booking.html" class="btn" style="margin-left: 250px;">
+                        <i class="fas fa-calendar-check"></i>
+                        Book Now
+                    </a>
+                </ul>
+
+                <!-- Advanced Hamburger Menu -->
+                <label class="hamburger" id="hamburger-menu">
+                    <input type="checkbox" id="hamburger-checkbox">
+                    <svg viewBox="0 0 32 32">
+                        <path class="line line-top-bottom"
+                            d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22">
+                        </path>
+                        <path class="line" d="M7 16 27 16"></path>
+                    </svg>
+                </label>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Enhanced Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay">
+        <ul class="mobile-nav-menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#services">Services</a></li>
+            <li><a href="saloon-contact-us.html">Contact</a></li>
+            <li><a href="saloon-booking.html">Booking</a></li>
+        </ul>
+        <a href="saloon-booking.html" class="mobile-book-btn">
+            <i class="fas fa-calendar-check"></i>
+            Book Appointment
+        </a>
+    </div>
+
+    <!-- Booking Hero Section -->
+    <section class="booking-hero">
+        <div class="container">
+            <h1>Book Your Appointment</h1>
+            <p>Schedule your beauty experience with our talented professionals. Choose from our wide range of premium services.</p>
+        </div>
+    </section>
+
+    <!-- Booking Process -->
+    <section class="booking-process">
+        <div class="container">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" id="step-1">
+                    <div class="step-circle">1</div>
+                    <div class="step-text">Select Service</div>
+                </div>
+                <div class="step" id="step-2">
+                    <div class="step-circle">2</div>
+                    <div class="step-text">Your Details</div>
+                </div>
+                <div class="step" id="step-3">
+                    <div class="step-circle">3</div>
+                    <div class="step-text">Date & Time</div>
+                </div>
+                <div class="step" id="step-4">
+                    <div class="step-circle">4</div>
+                    <div class="step-text">Confirmation</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Service Selection -->
+            <div class="step-content active" id="step-content-1">
+                <h3 class="step-title">Select Your Service</h3>
+                <div class="service-options">
+                    <div class="service-option" data-service="Haircut & Styling" data-price="25000" data-duration="60">
+                        <div class="service-icon">
+                            <i class="fas fa-cut"></i>
+                        </div>
+                        <div class="service-name">Haircut & Styling</div>
+                        <div class="service-price">UGX 25,000</div>
+                        <div class="service-duration">60 minutes</div>
+                    </div>
+                    <div class="service-option" data-service="Hair Coloring" data-price="50000" data-duration="120">
+                        <div class="service-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <div class="service-name">Hair Coloring</div>
+                        <div class="service-price">UGX 50,000</div>
+                        <div class="service-duration">120 minutes</div>
+                    </div>
+                    <div class="service-option" data-service="Hair Treatment" data-price="35000" data-duration="90">
+                        <div class="service-icon">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                        <div class="service-name">Hair Treatment</div>
+                        <div class="service-price">UGX 35,000</div>
+                        <div class="service-duration">90 minutes</div>
+                    </div>
+                    <div class="service-option" data-service="Braiding" data-price="40000" data-duration="120">
+                        <div class="service-badges">Popular</div>
+                        <div class="service-icon">
+                            <i class="fas fa-braille"></i>
+                        </div>
+                        <div class="service-name">Braiding</div>
+                        <div class="service-price">UGX 40,000</div>
+                        <div class="service-duration">120 minutes</div>
+                    </div>
+                    <div class="service-option" data-service="Facial Treatment" data-price="45000" data-duration="75">
+                        <div class="service-icon">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <div class="service-name">Facial Treatment</div>
+                        <div class="service-price">UGX 45,000</div>
+                        <div class="service-duration">75 minutes</div>
+                    </div>
+                    <div class="service-option" data-service="Manicure & Pedicure" data-price="30000" data-duration="90">
+                        <div class="service-icon">
+                            <i class="fas fa-hand-sparkles"></i>
+                        </div>
+                        <div class="service-name">Manicure & Pedicure</div>
+                        <div class="service-price">UGX 30,000</div>
+                        <div class="service-duration">90 minutes</div>
+                    </div>
+                </div>
+                <div class="booking-navigation">
+                    <div></div> <!-- Empty div for spacing -->
+                    <button class="btn-next" id="btn-next-1">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Personal Information -->
+            <div class="step-content" id="step-content-2">
+                <h3 class="step-title">Your Information</h3>
+                <form id="personal-info-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first-name">First Name</label>
+                            <input type="text" id="first-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="last-name">Last Name</label>
+                            <input type="text" id="last-name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Special Requests (Optional)</label>
+                        <textarea id="notes" class="form-control" placeholder="Any special requests or notes for our stylists..."></textarea>
+                    </div>
+                </form>
+                <div class="booking-navigation">
+                    <button class="btn-prev" id="btn-prev-2"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button class="btn-next" id="btn-next-2">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3: Date and Time Selection -->
+            <div class="step-content" id="step-content-3">
+                <h3 class="step-title">Select Date & Time</h3>
+                <div class="datetime-selection">
+                    <div class="calendar">
+                        <div class="calendar-header">
+                            <div class="calendar-month">June 2023</div>
+                            <div class="calendar-nav">
+                                <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                                <button id="next-month"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="calendar-weekdays">
+                            <div class="calendar-weekday">Sun</div>
+                            <div class="calendar-weekday">Mon</div>
+                            <div class="calendar-weekday">Tue</div>
+                            <div class="calendar-weekday">Wed</div>
+                            <div class="calendar-weekday">Thu</div>
+                            <div class="calendar-weekday">Fri</div>
+                            <div class="calendar-weekday">Sat</div>
+                        </div>
+                        <div class="calendar-days" id="calendar-days">
+                            <!-- Calendar days will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="time-selection">
+                        <h4 style="margin-bottom: 15px; color: var(--secondary);">Available Time Slots</h4>
+                        <div class="time-slots" id="time-slots">
+                            <!-- Time slots will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="booking-navigation">
+                    <button class="btn-prev" id="btn-prev-3"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button class="btn-next" id="btn-next-3">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 4: Confirmation -->
+            <div class="step-content" id="step-content-4">
+                <h3 class="step-title">Confirm Your Appointment</h3>
+                <div class="confirmation-details">
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Service:</span>
+                        <span class="confirmation-value" id="confirm-service">-</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Date:</span>
+                        <span class="confirmation-value" id="confirm-date">-</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Time:</span>
+                        <span class="confirmation-value" id="confirm-time">-</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Duration:</span>
+                        <span class="confirmation-value" id="confirm-duration">-</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Price:</span>
+                        <span class="confirmation-value" id="confirm-price">-</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Name:</span>
+                        <span class="confirmation-value" id="confirm-name">-</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Email:</span>
+                        <span class="confirmation-value" id="confirm-email">-</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="confirmation-label">Phone:</span>
+                        <span class="confirmation-value" id="confirm-phone">-</span>
+                    </div>
+                </div>
+                <div class="confirmation-actions">
+                    <button class="btn-prev" id="btn-prev-4"><i class="fas fa-edit"></i> Edit Details</button>
+                    <button class="btn-submit" id="btn-submit"><i class="fas fa-check-circle"></i> Confirm Booking</button>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div class="step-content" id="step-content-success">
+                <div class="success-message">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>Appointment Confirmed!</h3>
+                    <p>Thank you for booking with Beatrice Salon. We have sent a confirmation email to <span id="success-email"></span> with your appointment details.</p>
+                    <p>We look forward to seeing you on <span id="success-date"></span> at <span id="success-time"></span>.</p>
+                    <a href="index.html" class="btn" style="margin-top: 20px;">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Beatrice Salon</h3>
+                    <p>Premium beauty salon offering professional hair and beauty services for women and men. Experience luxury beauty care at its finest.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#about">About Us</a></li>
+                        <li><a href="index.html#services">Services</a></li>
+                        <li><a href="index.html#gallery">Gallery</a></li>
+                        <li><a href="index.html#team">Our Team</a></li>
+                        <li><a href="index.html#testimonials">Testimonials</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="index.html#services">Haircut & Styling</a></li>
+                        <li><a href="index.html#services">Hair Coloring</a></li>
+                        <li><a href="index.html#services">Hair Treatments</a></li>
+                        <li><a href="index.html#services">Braiding</a></li>
+                        <li><a href="index.html#services">Facial Treatments</a></li>
+                        <li><a href="index.html#services">Manicure & Pedicure</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column footer-newsletter">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to our newsletter to receive updates on promotions and beauty tips.</p>
+                    <form id="newsletter-form">
+                        <div class="form-group">
+                            <input type="email" class="form-control" placeholder="Your email address" required>
+                        </div>
+                        <button type="submit" class="btn">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="copyright">
+                <p>&copy; 2025 Beatrice Salon. All Rights Reserved. | Designed with <i class="fas fa-heart"
+                        style="color: var(--primary);"></i> <a href="#">Vernox</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="back-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </div>
+<script src="js/script.js"></script>
+</body>
+</html>
