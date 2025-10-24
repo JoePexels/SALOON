@@ -419,9 +419,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Other site functionality remains the same...
-
-  // === OTHER SITE SCRIPTS (keep these but outside modal logic) ===
+  
   const backToTop = document.getElementById("back-to-top");
   window.addEventListener("scroll", () => {
     backToTop.classList.toggle("active", window.pageYOffset > 300);
@@ -455,7 +453,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("appointment-form")
     ?.addEventListener("submit", (e) => {
       e.preventDefault();
-      alert("Thank you! We’ll contact you shortly to confirm your booking.");
+      alert("Thank you! We'll contact you shortly to confirm your booking.");
       e.target.reset();
     });
   document
@@ -465,16 +463,6 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Thank you for subscribing!");
       e.target.reset();
     });
-
-  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener("click", (e) => {
-      e.preventDefault();
-      const target = document.querySelector(anchor.getAttribute("href"));
-      if (target) {
-        window.scrollTo({ top: target.offsetTop - 100, behavior: "smooth" });
-      }
-    });
-  });
 
   // FAQ
   document.querySelectorAll(".faq-item").forEach((item) => {
@@ -540,7 +528,6 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
   const header = document.getElementById("header");
   const navMenu = document.getElementById("nav-menu");
-  const navLinks = document.querySelectorAll(".nav-link");
   const hamburgerMenu = document.getElementById("hamburger-menu");
   const hamburgerCheckbox = document.getElementById("hamburger-checkbox");
   const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
@@ -568,19 +555,6 @@ document.addEventListener("DOMContentLoaded", function () {
       header.classList.remove("scrolled");
       header.classList.add("transparent");
     }
-  });
-
-  // Handle click events for navigation links
-  navLinks.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
-
-      // Remove active class from all links
-      navLinks.forEach((l) => l.classList.remove("active"));
-
-      // Add active class to clicked link
-      this.classList.add("active");
-    });
   });
 
   // Handle hamburger menu toggle
@@ -693,10 +667,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize carousel
   updateCarousel();
 });
-
-
-
-
 
 // BOOKING PAGE
 
@@ -1117,11 +1087,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-
-
-
-
-
 // CONTACT US PAGE
 
 // FAQ Accordion Functionality
@@ -1180,24 +1145,6 @@ document.addEventListener("DOMContentLoaded", function () {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
-    });
-  });
-
-  // Smooth scrolling for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener("click", function (e) {
-      e.preventDefault();
-
-      const targetId = this.getAttribute("href");
-      if (targetId === "#") return;
-
-      const targetElement = document.querySelector(targetId);
-      if (targetElement) {
-        window.scrollTo({
-          top: targetElement.offsetTop - 100,
-          behavior: "smooth",
-        });
-      }
     });
   });
 });
