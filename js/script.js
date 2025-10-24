@@ -45,9 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Booking Data
   let currentStep = 1;
   let bookingData = {
-    service: null,
-    price: null,
-    duration: null,
+    services: [], // Changed to array to store multiple services
     date: null,
     time: null,
     firstName: "",
@@ -57,10 +55,8 @@ document.addEventListener("DOMContentLoaded", function () {
     notes: "",
   };
 
-  // Calendar & Time State
+  // Calendar State
   let currentDate = new Date();
-  let selectedDate = null;
-  let selectedTime = null;
 
   // Open Modal
   openModalButtons.forEach((button) => {
@@ -73,15 +69,24 @@ document.addEventListener("DOMContentLoaded", function () {
       // Pre-select service if coming from service card
       if (this.classList.contains("book-service-btn")) {
         const service = this.getAttribute("data-service");
-        const price = this.getAttribute("data-price");
-        const duration = this.getAttribute("data-duration");
+        const price = parseInt(this.getAttribute("data-price"));
+        const duration = parseInt(this.getAttribute("data-duration"));
 
         serviceOptions.forEach((option) => {
           if (option.getAttribute("data-service") === service) {
-            option.classList.add("selected");
-            bookingData.service = service;
-            bookingData.price = price;
-            bookingData.duration = duration;
+            // Add to selected services
+            const serviceData = {
+              service: service,
+              price: price,
+              duration: duration
+            };
+            
+            // Check if already selected
+            const existingIndex = bookingData.services.findIndex(s => s.service === service);
+            if (existingIndex === -1) {
+              bookingData.services.push(serviceData);
+              option.classList.add("selected");
+            }
           }
         });
       }
@@ -102,14 +107,36 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.target === modal) closeModalHandler();
   });
 
-  // Service Selection
+  // Service Selection - MULTI-SELECT
   serviceOptions.forEach((option) => {
     option.addEventListener("click", function () {
-      serviceOptions.forEach((opt) => opt.classList.remove("selected"));
-      this.classList.add("selected");
-      bookingData.service = this.getAttribute("data-service");
-      bookingData.price = this.getAttribute("data-price");
-      bookingData.duration = this.getAttribute("data-duration");
+      const service = this.getAttribute("data-service");
+      const price = parseInt(this.getAttribute("data-price"));
+      const duration = parseInt(this.getAttribute("data-duration"));
+      
+      // Toggle selection
+      this.classList.toggle("selected");
+      
+      // Find if service is already in the array
+      const existingIndex = bookingData.services.findIndex(s => s.service === service);
+      
+      if (this.classList.contains("selected")) {
+        // Add service if not already selected
+        if (existingIndex === -1) {
+          bookingData.services.push({
+            service: service,
+            price: price,
+            duration: duration
+          });
+        }
+      } else {
+        // Remove service if deselected
+        if (existingIndex !== -1) {
+          bookingData.services.splice(existingIndex, 1);
+        }
+      }
+      
+      console.log("Selected services:", bookingData.services);
     });
   });
 
@@ -140,8 +167,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelector(".modal-footer").style.display = "none";
 
     successEmail.textContent = bookingData.email;
-    successDate.textContent = formatDate(selectedDate);
-    successTime.textContent = selectedTime;
+    successDate.textContent = formatDate(bookingData.date);
+    successTime.textContent = bookingData.time;
 
     console.log("Booking submitted:", bookingData);
     // Here you would typically send the data to your backend
@@ -188,12 +215,12 @@ document.addEventListener("DOMContentLoaded", function () {
     btnNext.style.display = currentStep === 3 ? "none" : "block";
   }
 
-  // ✅ FIXED VALIDATION LOGIC - Using form-scoped elements
+  // ✅ UPDATED VALIDATION LOGIC - Check for at least one service
   function validateStep(step) {
     switch (step) {
       case 1:
-        if (!bookingData.service) {
-          alert("Please select a service.");
+        if (bookingData.services.length === 0) {
+          alert("Please select at least one service.");
           return false;
         }
         return true;
@@ -212,9 +239,10 @@ document.addEventListener("DOMContentLoaded", function () {
           lastName,
           email,
           phone,
-          selectedDate,
-          selectedTime,
-        }); // Debug log
+          bookingDataDate: bookingData.date,
+          bookingDataTime: bookingData.time,
+          servicesCount: bookingData.services.length
+        });
 
         if (!firstName || !lastName || !email || !phone) {
           alert("Please fill in all required personal information fields.");
@@ -227,12 +255,13 @@ document.addEventListener("DOMContentLoaded", function () {
           return false;
         }
 
-        if (!selectedDate) {
+        // Check bookingData directly instead of separate variables
+        if (!bookingData.date) {
           alert("Please select a date for your appointment.");
           return false;
         }
 
-        if (!selectedTime) {
+        if (!bookingData.time) {
           alert("Please select a time slot for your appointment.");
           return false;
         }
@@ -243,8 +272,6 @@ document.addEventListener("DOMContentLoaded", function () {
         bookingData.email = email;
         bookingData.phone = phone;
         bookingData.notes = notes;
-        bookingData.date = selectedDate;
-        bookingData.time = selectedTime;
         return true;
 
       default:
@@ -252,16 +279,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // ✅ UPDATED POPULATE CONFIRMATION - Show multiple services
   function populateConfirmation() {
-    confirmService.textContent = bookingData.service || "-";
-    confirmDate.textContent = formatDate(selectedDate);
-    confirmTime.textContent = selectedTime || "-";
-    confirmDuration.textContent = bookingData.duration
-      ? `${bookingData.duration} minutes`
-      : "-";
-    confirmPrice.textContent = bookingData.price
-      ? `UGX ${Number(bookingData.price).toLocaleString()}`
-      : "-";
+    // Calculate totals
+    const totalPrice = bookingData.services.reduce((sum, service) => sum + service.price, 0);
+    const totalDuration = bookingData.services.reduce((sum, service) => sum + service.duration, 0);
+    
+    // Display services list
+    if (bookingData.services.length === 1) {
+      confirmService.textContent = bookingData.services[0].service;
+    } else {
+      confirmService.innerHTML = bookingData.services.map(service => 
+        `<div>• ${service.service} - UGX ${service.price.toLocaleString()}</div>`
+      ).join('');
+    }
+    
+    confirmDate.textContent = formatDate(bookingData.date);
+    confirmTime.textContent = bookingData.time || "-";
+    confirmDuration.textContent = `${totalDuration} minutes`;
+    confirmPrice.textContent = `UGX ${totalPrice.toLocaleString()}`;
     confirmName.textContent = `${bookingData.firstName} ${bookingData.lastName}`;
     confirmEmail.textContent = bookingData.email;
     confirmPhone.textContent = bookingData.phone;
@@ -270,9 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function resetModal() {
     currentStep = 1;
     bookingData = {
-      service: null,
-      price: null,
-      duration: null,
+      services: [], // Reset to empty array
       date: null,
       time: null,
       firstName: "",
@@ -281,8 +315,6 @@ document.addEventListener("DOMContentLoaded", function () {
       phone: "",
       notes: "",
     };
-    selectedDate = null;
-    selectedTime = null;
 
     updateUI();
     personalInfoForm.reset();
@@ -299,22 +331,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
     ];
-    document.querySelector(
-      ".calendar-month"
-    ).textContent = `${monthNames[month]} ${year}`;
+    document.querySelector(".calendar-month").textContent = `${monthNames[month]} ${year}`;
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -341,24 +361,22 @@ document.addEventListener("DOMContentLoaded", function () {
         cell.classList.add("disabled");
       } else {
         cell.addEventListener("click", function () {
-          document
-            .querySelectorAll(".calendar-day")
-            .forEach((d) => d.classList.remove("selected"));
+          document.querySelectorAll(".calendar-day").forEach((d) => d.classList.remove("selected"));
           this.classList.add("selected");
-          selectedDate = cellDate;
-          selectedTime = null; // Reset time when date changes
+          
+          // Set bookingData directly
+          bookingData.date = new Date(cellDate);
+          bookingData.time = null; // Reset time when date changes
           resetTimeSlots();
-          console.log("Selected date:", selectedDate); // Debug log
+          console.log("Selected date:", bookingData.date);
         });
       }
 
       // Mark as selected if this is the currently selected date
-      if (
-        selectedDate &&
-        cellDate.getDate() === selectedDate.getDate() &&
-        cellDate.getMonth() === selectedDate.getMonth() &&
-        cellDate.getFullYear() === selectedDate.getFullYear()
-      ) {
+      if (bookingData.date &&
+          cellDate.getDate() === bookingData.date.getDate() &&
+          cellDate.getMonth() === bookingData.date.getMonth() &&
+          cellDate.getFullYear() === bookingData.date.getFullYear()) {
         cell.classList.add("selected");
       }
 
@@ -369,15 +387,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Time Slots
   function generateTimeSlots() {
     const times = [
-      "09:00 AM",
-      "10:00 AM",
-      "11:00 AM",
-      "12:00 PM",
-      "01:00 PM",
-      "02:00 PM",
-      "03:00 PM",
-      "04:00 PM",
-      "05:00 PM",
+      "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+      "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"
     ];
     timeSlots.innerHTML = "";
 
@@ -386,17 +397,17 @@ document.addEventListener("DOMContentLoaded", function () {
       slot.className = "time-slot";
       slot.textContent = time;
       slot.addEventListener("click", function () {
-        if (!selectedDate) {
+        if (!bookingData.date) {
           alert("Please select a date first.");
           return;
         }
 
-        document
-          .querySelectorAll(".time-slot")
-          .forEach((s) => s.classList.remove("selected"));
+        document.querySelectorAll(".time-slot").forEach((s) => s.classList.remove("selected"));
         this.classList.add("selected");
-        selectedTime = time;
-        console.log("Selected time:", selectedTime); // Debug log
+        
+        // Set bookingData directly
+        bookingData.time = time;
+        console.log("Selected time:", bookingData.time);
       });
       timeSlots.appendChild(slot);
     });
@@ -406,7 +417,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".time-slot").forEach((slot) => {
       slot.classList.remove("selected");
     });
-    selectedTime = null;
+    bookingData.time = null;
   }
 
   function formatDate(date) {
@@ -419,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  
+  // Back to Top Button
   const backToTop = document.getElementById("back-to-top");
   window.addEventListener("scroll", () => {
     backToTop.classList.toggle("active", window.pageYOffset > 300);
@@ -428,84 +439,70 @@ document.addEventListener("DOMContentLoaded", function () {
     window.scrollTo({ top: 0, behavior: "smooth" })
   );
 
+  // Header scroll effect
   window.addEventListener("scroll", () => {
     const header = document.getElementById("header");
     header.classList.toggle("scrolled", window.scrollY > 100);
   });
 
+  // Gallery filter
   document.querySelectorAll(".filter-btn").forEach((btn) => {
     btn.addEventListener("click", function () {
-      document
-        .querySelectorAll(".filter-btn")
-        .forEach((b) => b.classList.remove("active"));
+      document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
       this.classList.add("active");
       const filter = this.dataset.filter;
       document.querySelectorAll(".gallery-item").forEach((item) => {
-        item.style.display =
-          filter === "all" || item.dataset.category === filter
-            ? "block"
-            : "none";
+        item.style.display = filter === "all" || item.dataset.category === filter ? "block" : "none";
       });
     });
   });
 
-  document
-    .getElementById("appointment-form")
-    ?.addEventListener("submit", (e) => {
-      e.preventDefault();
-      alert("Thank you! We'll contact you shortly to confirm your booking.");
-      e.target.reset();
-    });
-  document
-    .getElementById("newsletter-form")
-    ?.addEventListener("submit", (e) => {
-      e.preventDefault();
-      alert("Thank you for subscribing!");
-      e.target.reset();
-    });
+  // Forms
+  document.getElementById("appointment-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    alert("Thank you! We'll contact you shortly to confirm your booking.");
+    e.target.reset();
+  });
+  
+  document.getElementById("newsletter-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    alert("Thank you for subscribing!");
+    e.target.reset();
+  });
 
   // FAQ
   document.querySelectorAll(".faq-item").forEach((item) => {
     item.querySelector(".faq-question").addEventListener("click", function () {
-      document
-        .querySelectorAll(".faq-item")
-        .forEach((i) => i !== item && i.classList.remove("active"));
+      document.querySelectorAll(".faq-item").forEach((i) => i !== item && i.classList.remove("active"));
       item.classList.toggle("active");
     });
   });
 });
 
+// Hero Carousel
 document.addEventListener("DOMContentLoaded", function () {
   const slides = document.querySelectorAll(".slide");
   const navLines = document.querySelectorAll(".nav-line");
   let currentSlide = 0;
 
-  // Function to show a specific slide
   function showSlide(index) {
-    // Remove active class from all slides and nav lines
     slides.forEach((slide) => slide.classList.remove("active"));
     navLines.forEach((line) => line.classList.remove("active"));
 
-    // Add active class to current slide and nav line
     slides[index].classList.add("active");
     navLines[index].classList.add("active");
 
     currentSlide = index;
   }
 
-  // Auto-advance slides
   function nextSlide() {
     let next = currentSlide + 1;
-    if (next >= slides.length) {
-      next = 0;
-    }
+    if (next >= slides.length) next = 0;
     showSlide(next);
   }
 
-  // Set up auto-rotation
   let slideInterval = setInterval(nextSlide, 6000);
 
-  // Add click events to navigation lines
   navLines.forEach((line, index) => {
     line.addEventListener("click", () => {
       clearInterval(slideInterval);
@@ -514,39 +511,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Pause auto-rotation when hovering over carousel
   const carousel = document.querySelector(".carousel");
-  carousel.addEventListener("mouseenter", () => {
-    clearInterval(slideInterval);
-  });
-
-  carousel.addEventListener("mouseleave", () => {
-    slideInterval = setInterval(nextSlide, 6000);
-  });
+  carousel.addEventListener("mouseenter", () => clearInterval(slideInterval));
+  carousel.addEventListener("mouseleave", () => slideInterval = setInterval(nextSlide, 6000));
 });
 
+// Mobile Navigation
 document.addEventListener("DOMContentLoaded", function () {
   const header = document.getElementById("header");
-  const navMenu = document.getElementById("nav-menu");
-  const hamburgerMenu = document.getElementById("hamburger-menu");
   const hamburgerCheckbox = document.getElementById("hamburger-checkbox");
   const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
 
-  // Function to close mobile menu
   function closeMobileMenu() {
     hamburgerCheckbox.checked = false;
     mobileNavOverlay.classList.remove("active");
     document.body.style.overflow = "auto";
   }
 
-  // Function to check window size and close menu if needed
   function checkWindowSize() {
-    if (window.innerWidth > 1024) {
-      closeMobileMenu();
-    }
+    if (window.innerWidth > 1024) closeMobileMenu();
   }
 
-  // Handle scroll event
   window.addEventListener("scroll", function () {
     if (window.scrollY > 100) {
       header.classList.remove("transparent");
@@ -557,7 +542,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Handle hamburger menu toggle
   hamburgerCheckbox.addEventListener("change", function () {
     if (this.checked) {
       mobileNavOverlay.classList.add("active");
@@ -568,32 +552,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Close mobile menu when clicking on a link
-  const mobileLinks = document.querySelectorAll(
-    ".mobile-nav-menu a, .mobile-book-btn"
-  );
+  const mobileLinks = document.querySelectorAll(".mobile-nav-menu a, .mobile-book-btn");
   mobileLinks.forEach((link) => {
-    link.addEventListener("click", function () {
-      closeMobileMenu();
-    });
+    link.addEventListener("click", closeMobileMenu);
   });
 
-  // Close menu when clicking outside on mobile
   mobileNavOverlay.addEventListener("click", function (e) {
-    if (e.target === mobileNavOverlay) {
-      closeMobileMenu();
-    }
+    if (e.target === mobileNavOverlay) closeMobileMenu();
   });
 
-  // Close mobile menu when window is resized to desktop size
-  window.addEventListener("resize", function () {
-    checkWindowSize();
-  });
-
-  // Initialize on page load
+  window.addEventListener("resize", checkWindowSize);
   checkWindowSize();
 });
 
+// Testimonials Carousel
 document.addEventListener("DOMContentLoaded", function () {
   const track = document.getElementById("testimonials-track");
   const slides = document.querySelectorAll(".testimonial-slide");
@@ -615,11 +587,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const dots = document.querySelectorAll(".dot");
 
-  // Function to update carousel position
   function updateCarousel() {
     track.style.transform = `translateX(-${currentSlide * 100}%)`;
 
-    // Update active states
     slides.forEach((slide, index) => {
       slide.classList.toggle("active", index === currentSlide);
     });
@@ -629,104 +599,79 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Function to go to specific slide
   function goToSlide(slideIndex) {
     currentSlide = slideIndex;
     updateCarousel();
   }
 
-  // Function to go to next slide
   function nextSlide() {
     currentSlide = (currentSlide + 1) % slideCount;
     updateCarousel();
   }
 
-  // Function to go to previous slide
   function prevSlide() {
     currentSlide = (currentSlide - 1 + slideCount) % slideCount;
     updateCarousel();
   }
 
-  // Event listeners for arrows
   prevArrow.addEventListener("click", prevSlide);
   nextArrow.addEventListener("click", nextSlide);
 
-  // Auto-advance slides
   let slideInterval = setInterval(nextSlide, 5000);
 
-  // Pause auto-advance on hover
   const carousel = document.querySelector(".testimonials-carousel");
-  carousel.addEventListener("mouseenter", () => {
-    clearInterval(slideInterval);
-  });
+  carousel.addEventListener("mouseenter", () => clearInterval(slideInterval));
+  carousel.addEventListener("mouseleave", () => slideInterval = setInterval(nextSlide, 5000));
 
-  carousel.addEventListener("mouseleave", () => {
-    slideInterval = setInterval(nextSlide, 5000);
-  });
-
-  // Initialize carousel
   updateCarousel();
 });
 
 
-// CONTACT US PAGE
 
-// FAQ Accordion Functionality
+// Contact Us Page
 document.addEventListener("DOMContentLoaded", function () {
+  // Only run FAQ if we're on a page with FAQ items
   const faqItems = document.querySelectorAll(".faq-item");
-
-  faqItems.forEach((item) => {
-    const question = item.querySelector(".faq-question");
-
-    question.addEventListener("click", function () {
-      // Toggle current item
-      const isActive = item.classList.contains("active");
-
-      // Close all items first
-      faqItems.forEach((otherItem) => {
-        otherItem.classList.remove("active");
+  if (faqItems.length > 0) {
+    faqItems.forEach((item) => {
+      const question = item.querySelector(".faq-question");
+      question.addEventListener("click", function () {
+        const isActive = item.classList.contains("active");
+        faqItems.forEach((otherItem) => otherItem.classList.remove("active"));
+        if (!isActive) item.classList.add("active");
       });
-
-      // If it wasn't active, open it
-      if (!isActive) {
-        item.classList.add("active");
-      }
     });
-  });
+  }
 
-  // Contact Form Submission
+  // Contact Form
   const contactForm = document.getElementById("contact-form");
-  contactForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    alert(
-      "Thank you for your message! We will get back to you as soon as possible."
-    );
-    contactForm.reset();
-  });
+  if (contactForm) {
+    contactForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      alert("Thank you for your message! We will get back to you as soon as possible.");
+      contactForm.reset();
+    });
+  }
 
-  // Newsletter Form Submission
+  // Newsletter Form
   const newsletterForm = document.getElementById("newsletter-form");
-  newsletterForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    alert("Thank you for subscribing to our newsletter!");
-    newsletterForm.reset();
-  });
+  if (newsletterForm) {
+    newsletterForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      alert("Thank you for subscribing to our newsletter!");
+      newsletterForm.reset();
+    });
+  }
 
   // Back to Top Button
   const backToTop = document.getElementById("back-to-top");
-
-  window.addEventListener("scroll", function () {
-    if (window.pageYOffset > 300) {
-      backToTop.classList.add("active");
-    } else {
-      backToTop.classList.remove("active");
-    }
-  });
-
-  backToTop.addEventListener("click", function () {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
+  if (backToTop) {
+    window.addEventListener("scroll", function () {
+      backToTop.classList.toggle("active", window.pageYOffset > 300);
     });
-  });
+
+    backToTop.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 });

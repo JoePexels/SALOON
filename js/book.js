@@ -1,13 +1,11 @@
-
-// BOOKING PAGE
-
+// Booking Page (also updated for multi-select)
 document.addEventListener("DOMContentLoaded", function () {
-  // Booking Data
+  // Only run if we're on the booking page
+  if (!document.getElementById("btn-next-1")) return;
+
   let currentStep = 1;
   let bookingData = {
-    service: null,
-    price: null,
-    duration: null,
+    services: [], // Changed to array
     date: null,
     time: null,
     firstName: "",
@@ -17,19 +15,12 @@ document.addEventListener("DOMContentLoaded", function () {
     notes: "",
   };
 
-  // Calendar Data
   let currentDate = new Date();
-  let selectedDate = null;
-  let selectedTime = null;
 
-  // Step Elements
   const steps = document.querySelectorAll(".step");
   const stepContents = document.querySelectorAll(".step-content");
-
-  // Service Selection
   const serviceOptions = document.querySelectorAll(".service-option");
 
-  // Navigation Buttons
   const btnNext1 = document.getElementById("btn-next-1");
   const btnPrev2 = document.getElementById("btn-prev-2");
   const btnNext2 = document.getElementById("btn-next-2");
@@ -38,7 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnPrev4 = document.getElementById("btn-prev-4");
   const btnSubmit = document.getElementById("btn-submit");
 
-  // Confirmation Elements
   const confirmService = document.getElementById("confirm-service");
   const confirmDate = document.getElementById("confirm-date");
   const confirmTime = document.getElementById("confirm-time");
@@ -48,34 +38,49 @@ document.addEventListener("DOMContentLoaded", function () {
   const confirmEmail = document.getElementById("confirm-email");
   const confirmPhone = document.getElementById("confirm-phone");
 
-  // Success Elements
   const successEmail = document.getElementById("success-email");
   const successDate = document.getElementById("success-date");
   const successTime = document.getElementById("success-time");
 
-  // Calendar Elements
   const calendarDays = document.getElementById("calendar-days");
   const timeSlots = document.getElementById("time-slots");
   const prevMonth = document.getElementById("prev-month");
   const nextMonth = document.getElementById("next-month");
 
-  // Initialize Calendar
+  // Initialize
   renderCalendar();
   generateTimeSlots();
 
-  // Service Selection
+  // Service Selection - MULTI-SELECT
   serviceOptions.forEach((option) => {
     option.addEventListener("click", function () {
-      // Remove selected class from all options
-      serviceOptions.forEach((opt) => opt.classList.remove("selected"));
-
-      // Add selected class to clicked option
-      this.classList.add("selected");
-
-      // Update booking data
-      bookingData.service = this.getAttribute("data-service");
-      bookingData.price = this.getAttribute("data-price");
-      bookingData.duration = this.getAttribute("data-duration");
+      const service = this.getAttribute("data-service");
+      const price = parseInt(this.getAttribute("data-price"));
+      const duration = parseInt(this.getAttribute("data-duration"));
+      
+      // Toggle selection
+      this.classList.toggle("selected");
+      
+      // Find if service is already in the array
+      const existingIndex = bookingData.services.findIndex(s => s.service === service);
+      
+      if (this.classList.contains("selected")) {
+        // Add service if not already selected
+        if (existingIndex === -1) {
+          bookingData.services.push({
+            service: service,
+            price: price,
+            duration: duration
+          });
+        }
+      } else {
+        // Remove service if deselected
+        if (existingIndex !== -1) {
+          bookingData.services.splice(existingIndex, 1);
+        }
+      }
+      
+      console.log("Selected services:", bookingData.services);
     });
   });
 
@@ -125,19 +130,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Submit Booking
   btnSubmit.addEventListener("click", function () {
-    // In a real application, you would send the data to a server here
-    // For this demo, we'll just show the success message
-
-    // Show success step
     document.getElementById("step-content-4").classList.remove("active");
     document.getElementById("step-content-success").classList.add("active");
 
-    // Update success details
     successEmail.textContent = bookingData.email;
-    successDate.textContent = formatDate(selectedDate);
-    successTime.textContent = selectedTime;
+    successDate.textContent = formatDate(bookingData.date);
+    successTime.textContent = bookingData.time;
 
-    // In a real application, you would send the form data to a server here
     console.log("Booking submitted:", bookingData);
   });
 
@@ -150,32 +149,6 @@ document.addEventListener("DOMContentLoaded", function () {
   nextMonth.addEventListener("click", function () {
     currentDate.setMonth(currentDate.getMonth() + 1);
     renderCalendar();
-  });
-
-  // Back to Top Button
-  const backToTop = document.getElementById("back-to-top");
-
-  window.addEventListener("scroll", function () {
-    if (window.pageYOffset > 300) {
-      backToTop.classList.add("active");
-    } else {
-      backToTop.classList.remove("active");
-    }
-  });
-
-  backToTop.addEventListener("click", function () {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  });
-
-  // Newsletter Form Submission
-  const newsletterForm = document.getElementById("newsletter-form");
-  newsletterForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    alert("Thank you for subscribing to our newsletter!");
-    newsletterForm.reset();
   });
 
   // Functions
@@ -205,32 +178,28 @@ document.addEventListener("DOMContentLoaded", function () {
   function validateStep(step) {
     switch (step) {
       case 1:
-        if (!bookingData.service) {
-          alert("Please select a service");
+        if (bookingData.services.length === 0) {
+          alert("Please select at least one service");
           return false;
         }
         return true;
       case 2:
-        // Get form values
         const firstName = document.getElementById("first-name").value.trim();
         const lastName = document.getElementById("last-name").value.trim();
         const email = document.getElementById("email").value.trim();
         const phone = document.getElementById("phone").value.trim();
 
-        // Validate required fields
         if (!firstName || !lastName || !email || !phone) {
           alert("Please fill in all required fields");
           return false;
         }
 
-        // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
           alert("Please enter a valid email address");
           return false;
         }
 
-        // Update booking data
         bookingData.firstName = firstName;
         bookingData.lastName = lastName;
         bookingData.email = email;
@@ -239,15 +208,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         return true;
       case 3:
-        if (!selectedDate || !selectedTime) {
+        if (!bookingData.date || !bookingData.time) {
           alert("Please select a date and time for your appointment");
           return false;
         }
-
-        // Update booking data
-        bookingData.date = selectedDate;
-        bookingData.time = selectedTime;
-
         return true;
       default:
         return true;
@@ -255,13 +219,23 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function populateConfirmation() {
-    confirmService.textContent = bookingData.service;
-    confirmDate.textContent = formatDate(selectedDate);
-    confirmTime.textContent = selectedTime;
-    confirmDuration.textContent = `${bookingData.duration} minutes`;
-    confirmPrice.textContent = `UGX ${Number(
-      bookingData.price
-    ).toLocaleString()}`;
+    // Calculate totals
+    const totalPrice = bookingData.services.reduce((sum, service) => sum + service.price, 0);
+    const totalDuration = bookingData.services.reduce((sum, service) => sum + service.duration, 0);
+    
+    // Display services list
+    if (bookingData.services.length === 1) {
+      confirmService.textContent = bookingData.services[0].service;
+    } else {
+      confirmService.innerHTML = bookingData.services.map(service => 
+        `<div>• ${service.service} - UGX ${service.price.toLocaleString()}</div>`
+      ).join('');
+    }
+    
+    confirmDate.textContent = formatDate(bookingData.date);
+    confirmTime.textContent = bookingData.time;
+    confirmDuration.textContent = `${totalDuration} minutes`;
+    confirmPrice.textContent = `UGX ${totalPrice.toLocaleString()}`;
     confirmName.textContent = `${bookingData.firstName} ${bookingData.lastName}`;
     confirmEmail.textContent = bookingData.email;
     confirmPhone.textContent = bookingData.phone;
@@ -271,40 +245,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
 
-    // Update calendar header
     const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
     ];
-    document.querySelector(
-      ".calendar-month"
-    ).textContent = `${monthNames[month]} ${year}`;
+    document.querySelector(".calendar-month").textContent = `${monthNames[month]} ${year}`;
 
-    // Get first day of month and number of days
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    // Clear previous calendar
     calendarDays.innerHTML = "";
 
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
       const emptyCell = document.createElement("div");
       emptyCell.className = "calendar-day disabled";
       calendarDays.appendChild(emptyCell);
     }
 
-    // Add cells for each day of the month
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -315,44 +272,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const cellDate = new Date(year, month, i);
 
-      // Disable past dates
       if (cellDate < today) {
         dayCell.classList.add("disabled");
       } else {
         dayCell.addEventListener("click", function () {
-          // Remove selected class from all days
           document.querySelectorAll(".calendar-day").forEach((day) => {
             day.classList.remove("selected");
           });
 
-          // Add selected class to clicked day
           this.classList.add("selected");
-
-          // Update selected date
-          selectedDate = new Date(cellDate);
-
-          // Reset time selection
-          selectedTime = null;
+          bookingData.date = new Date(cellDate);
+          bookingData.time = null;
           resetTimeSlots();
         });
       }
 
-      // Mark today
-      if (
-        cellDate.getDate() === today.getDate() &&
-        cellDate.getMonth() === today.getMonth() &&
-        cellDate.getFullYear() === today.getFullYear()
-      ) {
+      if (cellDate.getDate() === today.getDate() &&
+          cellDate.getMonth() === today.getMonth() &&
+          cellDate.getFullYear() === today.getFullYear()) {
         dayCell.classList.add("today");
       }
 
-      // Mark selected date
-      if (
-        selectedDate &&
-        cellDate.getDate() === selectedDate.getDate() &&
-        cellDate.getMonth() === selectedDate.getMonth() &&
-        cellDate.getFullYear() === selectedDate.getFullYear()
-      ) {
+      if (bookingData.date &&
+          cellDate.getDate() === bookingData.date.getDate() &&
+          cellDate.getMonth() === bookingData.date.getMonth() &&
+          cellDate.getFullYear() === bookingData.date.getFullYear()) {
         dayCell.classList.add("selected");
       }
 
@@ -361,18 +305,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function generateTimeSlots() {
-    // In a real application, you would get available time slots from the server
-    // For this demo, we'll generate some sample time slots
     const times = [
-      "09:00 AM",
-      "10:00 AM",
-      "11:00 AM",
-      "12:00 PM",
-      "01:00 PM",
-      "02:00 PM",
-      "03:00 PM",
-      "04:00 PM",
-      "05:00 PM",
+      "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+      "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"
     ];
 
     timeSlots.innerHTML = "";
@@ -383,16 +318,12 @@ document.addEventListener("DOMContentLoaded", function () {
       timeSlot.textContent = time;
 
       timeSlot.addEventListener("click", function () {
-        // Remove selected class from all time slots
         document.querySelectorAll(".time-slot").forEach((slot) => {
           slot.classList.remove("selected");
         });
 
-        // Add selected class to clicked time slot
         this.classList.add("selected");
-
-        // Update selected time
-        selectedTime = time;
+        bookingData.time = time;
       });
 
       timeSlots.appendChild(timeSlot);
@@ -403,6 +334,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".time-slot").forEach((slot) => {
       slot.classList.remove("selected");
     });
+    bookingData.time = null;
   }
 
   function formatDate(date) {
@@ -415,5 +347,15 @@ document.addEventListener("DOMContentLoaded", function () {
       day: "numeric",
     };
     return date.toLocaleDateString("en-US", options);
+  }
+
+  // Newsletter Form Submission
+  const newsletterForm = document.getElementById("newsletter-form");
+  if (newsletterForm) {
+    newsletterForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      alert("Thank you for subscribing to our newsletter!");
+      newsletterForm.reset();
+    });
   }
 });
