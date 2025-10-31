@@ -145,7 +145,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (currentStep < 3 && validateStep(currentStep)) {
       currentStep++;
       updateUI();
-      if (currentStep === 3) populateConfirmation();
+      if (currentStep === 3) {
+        populateConfirmation();
+      }
     }
   });
 
@@ -171,8 +173,6 @@ document.addEventListener("DOMContentLoaded", function () {
     successTime.textContent = bookingData.time;
 
     console.log("Booking submitted:", bookingData);
-    // Here you would typically send the data to your backend
-    // Example: sendBookingData(bookingData);
   });
 
   // Calendar Navigation
@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
   renderCalendar();
   generateTimeSlots();
 
-  // UI Update Helper
+  // UI Update Helper - FIXED STEP DISPLAY
   function updateUI() {
     updateStepIndicator();
     updateStepContent();
@@ -206,13 +206,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateStepContent() {
     stepContents.forEach((content, i) => {
-      content.classList.toggle("active", i + 1 === currentStep);
+      // Only show the current step content
+      if (i + 1 === currentStep) {
+        content.classList.add("active");
+      } else {
+        content.classList.remove("active");
+      }
     });
+    
+    // Ensure success step is hidden unless we're on it
+    const successContent = document.getElementById("step-content-success");
+    if (currentStep !== 4) {
+      successContent.classList.remove("active");
+    }
   }
 
   function updateNavigationButtons() {
     btnPrev.disabled = currentStep === 1;
     btnNext.style.display = currentStep === 3 ? "none" : "block";
+    
+    // Show submit button only on step 3
+    if (submitBooking) {
+      submitBooking.style.display = currentStep === 3 ? "block" : "none";
+    }
   }
 
   // ✅ UPDATED VALIDATION LOGIC - Check for at least one service
@@ -290,7 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
       confirmService.textContent = bookingData.services[0].service;
     } else {
       confirmService.innerHTML = bookingData.services.map(service => 
-        `<div>• ${service.service} - UGX ${service.price.toLocaleString()}</div>`
+        `<div style="margin-bottom: 5px;">• ${service.service} - UGX ${service.price.toLocaleString()}</div>`
       ).join('');
     }
     
@@ -322,8 +338,12 @@ document.addEventListener("DOMContentLoaded", function () {
     renderCalendar();
     resetTimeSlots();
     document.querySelector(".modal-footer").style.display = "flex";
+    
+    // Reset all step contents to proper state
     document.getElementById("step-content-success").classList.remove("active");
-    document.getElementById("step-content-3").classList.add("active");
+    document.getElementById("step-content-1").classList.add("active");
+    document.getElementById("step-content-2").classList.remove("active");
+    document.getElementById("step-content-3").classList.remove("active");
   }
 
   // Calendar Rendering
@@ -432,17 +452,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Back to Top Button
   const backToTop = document.getElementById("back-to-top");
-  window.addEventListener("scroll", () => {
-    backToTop.classList.toggle("active", window.pageYOffset > 300);
-  });
-  backToTop.addEventListener("click", () =>
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  );
+  if (backToTop) {
+    window.addEventListener("scroll", () => {
+      backToTop.classList.toggle("active", window.pageYOffset > 300);
+    });
+    backToTop.addEventListener("click", () =>
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    );
+  }
 
   // Header scroll effect
   window.addEventListener("scroll", () => {
     const header = document.getElementById("header");
-    header.classList.toggle("scrolled", window.scrollY > 100);
+    if (header) {
+      header.classList.toggle("scrolled", window.scrollY > 100);
+    }
   });
 
   // Gallery filter
@@ -478,6 +502,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+
 
 // Hero Carousel
 document.addEventListener("DOMContentLoaded", function () {
@@ -628,7 +654,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-// Contact Us Page
+// CONTACT US PAGE
 document.addEventListener("DOMContentLoaded", function () {
   // Only run FAQ if we're on a page with FAQ items
   const faqItems = document.querySelectorAll(".faq-item");
